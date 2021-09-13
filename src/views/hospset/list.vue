@@ -1,5 +1,53 @@
 <template>
-  <div>list</div>
+  <div class="app-container">
+    <el-form :inline="true" class="demo-form-inline">
+      <el-form-item>
+        <el-input v-model="searchObj.hosname" placeholder="医院名称" />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="searchObj.hoscode" placeholder="医院编号" />
+      </el-form-item>
+      <el-button type="primary" icon="el-icon-search" @click="getList()">
+        查询
+      </el-button>
+    </el-form>
+    <!-- list -->
+    <el-table :data="list" style="width: 100%" stripe>
+      <el-table-column type="index" label="序号" width="50" />
+      <el-table-column prop="hosname" label="医院名称" />
+      <el-table-column prop="hoscode" label="医院编号" />
+      <el-table-column prop="apiUrl" label="api基础路径" width="200" />
+      <el-table-column prop="contactName" label="联系人姓名" />
+      <el-table-column prop="contactPhone" label="联系人手机" />
+      <el-table-column prop="contactPhone" label="联系人手机" />
+      <el-table-column label="状态" width="80">
+        <template slot-scope="scope">
+          {{ scope.row.status === 1 ? "可用" : "不可用" }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="280" align="center">
+        <template slot-scope="scope">
+          <el-button
+            type="danger"
+            size="mini"
+            icon="el-icon-delete"
+            @click="removeDataById(scope.row.id)"
+          />
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 分页 -->
+    <el-pagination
+      :current-page="current"
+      :total="total"
+      :page-size="limit"
+      style="padding: 30px 0; text-algin: center"
+      background
+      layout="prev, pager, next, jumper, ->, total"
+      @current-change="getList"
+    />
+  </div>
 </template>
 
 <script>
@@ -14,10 +62,11 @@ export default {
     // 这里存放数据
     return {
       current: 1,
-      limit: 3,
+      limit: 10,
       searchObj: {},
-      list: [],
-    };
+      total: 0,
+      list: []
+    }
   },
   // 计算属性:类似于data概念,有缓存效果,用于不经常修改的数据
   computed: {},
@@ -25,7 +74,7 @@ export default {
   watch: {},
   beforeCreate() {}, // 生命周期-创建之前
   created() {
-    this.getList()
+    this.getList(1)
   },
   // 方法集合
   beforeMount() {}, // 生命周期-挂载之前
@@ -36,19 +85,25 @@ export default {
   beforeDestroy() {}, // 生命周期-销毁之前
   destroyed() {}, // 生命周期-销毁完成
   methods: {
-    getList() {
+    getList(curr = 1) {
+      this.current = curr
       hospset
-        .getHospSetList(this.current, this.limit, this.searchObj)
-        .then(({ data }) => {
-          console.log(data);
+        .getHospSetList(curr, this.limit, this.searchObj)
+        .then((data) => {
+          this.list = data.data.records
+          this.total = data.total
+          console.log(data)
         })
         .catch((error) => {
-          console.log(error);
-        });
+          console.log(error)
+        })
     },
-  }, // 生命周期-创建完成（可以访问当前this实例）
-};
+    removeDataById(id) {
+      alert(id)
+    }
+  } // 生命周期-创建完成（可以访问当前this实例）
+}
 </script>
 
-<style scoped>
+<style scoped>
 </style>
