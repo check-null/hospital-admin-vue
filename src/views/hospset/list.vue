@@ -11,15 +11,29 @@
         查询
       </el-button>
     </el-form>
+    <div>
+      <el-button
+        type="danger"
+        size="mini"
+        @click="removeRows()"
+      >批量删除</el-button
+      >
+    </div>
+
     <!-- list -->
-    <el-table :data="list" style="width: 100%" stripe>
+    <el-table
+      :data="list"
+      style="width: 100%"
+      stripe
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="50" />
       <el-table-column type="index" label="序号" width="50" />
       <el-table-column prop="hosname" label="医院名称" />
       <el-table-column prop="hoscode" label="医院编号" />
       <el-table-column prop="apiUrl" label="api基础路径" width="200" />
-      <el-table-column prop="contactName" label="联系人姓名" />
-      <el-table-column prop="contactPhone" label="联系人手机" />
-      <el-table-column prop="contactPhone" label="联系人手机" />
+      <el-table-column prop="contactsName" label="联系人姓名" />
+      <el-table-column prop="contactsPhone" label="联系人手机" />
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
           {{ scope.row.status === 1 ? "可用" : "不可用" }}
@@ -27,12 +41,30 @@
       </el-table-column>
       <el-table-column label="操作" width="280" align="center">
         <template slot-scope="scope">
+          <!-- 修改 -->
+          <router-link :to="`/hospSet/edit/${scope.row.id}`">
+            <el-button type="primary" size="mini" icon="el-icon-edit"/>
+          </router-link>
+          <!-- 删除 -->
           <el-button
             type="danger"
             size="mini"
             icon="el-icon-delete"
             @click="removeDataById(scope.row.id)"
           />
+          <!-- 锁定 -->
+          <el-tooltip
+            :content="'状态: ' + scope.row.status == 1 ? '未锁定' : '已锁定'"
+            placement="top"
+          >
+            <el-switch
+              v-model="scope.row.status"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            />
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -41,7 +73,8 @@
     <el-pagination
       :current-page="current"
       :total="total"
-      :page-size="limit"
+      :page-size="size"
+      :page-count="pageCount"
       style="padding: 30px 0; text-algin: center"
       background
       layout="prev, pager, next, jumper, ->, total"
@@ -62,10 +95,12 @@ export default {
     // 这里存放数据
     return {
       current: 1,
-      limit: 10,
-      searchObj: {},
+      size: 3,
       total: 0,
-      list: []
+      pageCount: 0,
+      searchObj: {},
+      list: [],
+      multipleSelection: []
     }
   },
   // 计算属性:类似于data概念,有缓存效果,用于不经常修改的数据
@@ -74,7 +109,7 @@ export default {
   watch: {},
   beforeCreate() {}, // 生命周期-创建之前
   created() {
-    this.getList(1)
+    this.getList()
   },
   // 方法集合
   beforeMount() {}, // 生命周期-挂载之前
@@ -88,18 +123,72 @@ export default {
     getList(curr = 1) {
       this.current = curr
       hospset
-        .getHospSetList(curr, this.limit, this.searchObj)
+        .getHospSetList(curr, this.size, this.searchObj)
         .then((data) => {
           this.list = data.data.records
-          this.total = data.total
+          // 总条数
+          this.total = data.data.total
+          // 总页数
+          this.pageCount = data.data.pages
+          // this.size = data.size
+          // 1
           console.log(data)
-        })
-        .catch((error) => {
-          console.log(error)
         })
     },
     removeDataById(id) {
-      alert(id)
+      this.$confirm('此操作将永久删除医院是设置信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          // 确定执行then方法
+          // 调用接口
+          hospset.deleteHospSet(id).then((response) => {
+            // 提示
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            // 刷新页面
+            this.getList()
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    removeRows() {
+      this.$confirm('此操作将永久删除医院是设置信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          const ids = this.multipleSelection.map((s) => s.id)
+          hospset.batchDelete(ids).then((response) => {
+            // 提示
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            // 刷新页面
+            this.getList()
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    handleSelectionChange(selection) {
+      this.multipleSelection = selection
+    },
+    lockHospSet(id, status) {
+      hospset.lockHospSet(id, status).then((data) => {
+        if (data.code === 200) {
+          this.getList()
+        }
+      })
     }
   } // 生命周期-创建完成（可以访问当前this实例）
 }
