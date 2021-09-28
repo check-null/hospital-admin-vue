@@ -16,9 +16,17 @@ export default {
       method: 'get'
     })
   },
+  // 根据id查数据列表
   findChildId(id) {
     return request({
       url: `/admin/cmn/dict/findChildData/${id}`,
+      method: 'get'
+    })
+  },
+  // 更新医院上线状态
+  updateStatus(id, status) {
+    return request({
+      url: `/admin/hosp/hospital/updateHospStatus/${id}/${status}`,
       method: 'get'
     })
   }
