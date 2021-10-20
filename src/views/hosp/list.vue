@@ -72,12 +72,21 @@
       <el-table-column prop="param.fullAddress" label="详情地址" />
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
-          {{ scope.row.status === 0 ? "未上线" : "已上线" }}
+          {{ scope.row.status == 0 ? "未上线" : "已上线" }}
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" />
 
-      <el-table-column label="操作" width="230" align="center" />
+      <el-table-column label="操作" width="230" align="center">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            active-text="已上线"
+            inactive-text="未上线"
+            @change="updateStatus(scope.row.id, scope.row.status)"
+          />
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- 分页组件 -->
@@ -134,6 +143,11 @@ export default {
   destroyed() {},
   // 方法集合
   methods: {
+    updateStatus(id, status) {
+      hospApi.updateStatus(id, 1).then((data) => {
+        this.fetchData(1)
+      })
+    },
     fetchData(page = 1) {
       this.page = page
       hospApi
@@ -142,21 +156,30 @@ export default {
           this.list = data.content
           this.total = data.totalElements
           this.listLoading = false
-        }).catch(err => console.log(err, 'fetchData'))
+          // todo 解决status number 与 bool冲突问题
+          console.log(this.list[0])
+        })
+        .catch((err) => console.log(err, 'fetchData'))
     },
     findAllProvince() {
-      hospApi.findByDictCode('Province').then(({ data }) => {
-        this.provinceList = data
-      }).catch(err => console.log(err, 'findAllProvince'))
+      hospApi
+        .findByDictCode('Province')
+        .then(({ data }) => {
+          this.provinceList = data
+        })
+        .catch((err) => console.log(err, 'findAllProvince'))
     },
     provinceChanged() {
       this.cityList = []
       this.searchObj.cityCode = null
 
-      hospApi.findChildId(this.searchObj.provinceCode).then(({ data }) => {
-        this.cityList = data
-        console.log(data)
-      }).catch(err => console.log(err, 'provinceChanged'))
+      hospApi
+        .findChildId(this.searchObj.provinceCode)
+        .then(({ data }) => {
+          this.cityList = data
+          console.log(data)
+        })
+        .catch((err) => console.log(err, 'provinceChanged'))
     },
     changeSize(size) {
       this.limit = size
