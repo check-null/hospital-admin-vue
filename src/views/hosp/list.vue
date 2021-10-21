@@ -72,7 +72,7 @@
       <el-table-column prop="param.fullAddress" label="详情地址" />
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
-          {{ scope.row.status == 0 ? "未上线" : "已上线" }}
+          {{ (scope.row.status | 0) === 0 ? "未上线" : "已上线" }}
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" />
@@ -81,6 +81,8 @@
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
+            :active-value="1"
+            :inactive-value="0"
             active-text="已上线"
             inactive-text="未上线"
             @change="updateStatus(scope.row.id, scope.row.status)"
@@ -144,9 +146,10 @@ export default {
   // 方法集合
   methods: {
     updateStatus(id, status) {
-      hospApi.updateStatus(id, 1).then((data) => {
-        this.fetchData(1)
-      })
+      hospApi.updateStatus(id, (status | 0))
+        .then((data) => {
+          this.fetchData(this.page)
+        })
     },
     fetchData(page = 1) {
       this.page = page
@@ -156,8 +159,6 @@ export default {
           this.list = data.content
           this.total = data.totalElements
           this.listLoading = false
-          // todo 解决status number 与 bool冲突问题
-          console.log(this.list[0])
         })
         .catch((err) => console.log(err, 'fetchData'))
     },

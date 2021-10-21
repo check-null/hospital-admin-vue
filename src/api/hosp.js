@@ -29,5 +29,12 @@ export default {
       url: `/admin/hosp/hospital/updateHospStatus/${id}/${status}`,
       method: 'get'
     })
+  },
+  // 通过id获得医院详情
+  getHospById(id) {
+    return request({
+      url: `/admin/hosp/hospital/showHospDetail/${id}`,
+      method: 'get'
+    })
   }
 }
