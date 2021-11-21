@@ -54,7 +54,7 @@
           <td>{{ bookingRule.stopTime }}</td>
           <th>退号时间</th>
           <td>
-            {{ bookingRule.quitDay == -1 ? "就诊前一工作日" : "就诊当日"
+            {{ bookingRule.quitDay === -1 ? "就诊前一工作日" : "就诊当日"
             }}{{ bookingRule.quitTime }} 前取消
           </td>
         </tr>
@@ -95,7 +95,11 @@ export default {
   // 监控data中的数据变化
   watch: {},
   beforeCreate() {}, // 生命周期-创建之前
-  created() {}, // 生命周期-创建完成（可以访问当前this实例）
+  created() {
+    // 获得路由id
+    const id = this.$route.params.id
+    this.fetchHospDetail(id)
+  }, // 生命周期-创建完成（可以访问当前this实例）
   beforeMount() {}, // 生命周期-挂载之前
   mounted() {}, // 生命周期-挂载完成（可以访问DOM元素）
   activated() {}, // 如果页面有keep-alive缓存功能，这个函数会触发
@@ -104,7 +108,19 @@ export default {
   beforeDestroy() {}, // 生命周期-销毁之前
   destroyed() {}, // 生命周期-销毁完成
   // 方法集合
-  methods: { }
+  methods: {
+    fetchHospDetail(id) {
+      hospApi.getHospById(id)
+        .then((result) => {
+          this.hospital = result.data.hospital
+          this.bookingRule = result.data.bookingRule
+        })
+    },
+    back() {
+      // 返回医院列表
+      this.$router.push({ path: '/hospSet/hosp/list' })
+    }
+  }
 }
 </script>
 

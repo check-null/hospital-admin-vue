@@ -79,6 +79,9 @@
 
       <el-table-column label="操作" width="230" align="center">
         <template slot-scope="scope">
+          <router-link :to="'/hospSet/hospital/show/' + scope.row.id">
+            <el-button type="primay" size="mini">查看</el-button>
+          </router-link>
           <el-switch
             v-model="scope.row.status"
             :active-value="1"
@@ -87,6 +90,9 @@
             inactive-text="未上线"
             @change="updateStatus(scope.row.id, scope.row.status)"
           />
+          <router-link :to="'/hospSet/hospital/schedule/' + scope.row.hoscode">
+            <el-button type="primay" size="mini">排班</el-button>
+          </router-link>
         </template>
       </el-table-column>
     </el-table>
@@ -146,10 +152,9 @@ export default {
   // 方法集合
   methods: {
     updateStatus(id, status) {
-      hospApi.updateStatus(id, (status | 0))
-        .then((data) => {
-          this.fetchData(this.page)
-        })
+      hospApi.updateStatus(id, status | 0).then((data) => {
+        this.fetchData(this.page)
+      })
     },
     fetchData(page = 1) {
       this.page = page

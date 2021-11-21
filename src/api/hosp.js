@@ -36,5 +36,12 @@ export default {
       url: `/admin/hosp/hospital/showHospDetail/${id}`,
       method: 'get'
     })
+  },
+  // 通过id获得医院详情
+  getDeptByHospcode(hospcode) {
+    return request({
+      url: `/admin/hosp/department/getDeptList/${hospcode}`,
+      method: 'get'
+    })
   }
 }
