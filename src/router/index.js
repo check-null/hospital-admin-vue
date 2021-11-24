@@ -99,7 +99,7 @@ export const constantRouterMap = [
         hidden: true
       },
       {
-        path: 'hospital/schedule/:hospcode',
+        path: 'hospital/schedule/:hoscode',
         name: '排班',
         component: () => import('@/views/hosp/schedule'),
         meta: { title: '排班', noCache: true },
