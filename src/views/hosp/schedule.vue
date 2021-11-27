@@ -7,7 +7,7 @@
         <el-tree
           :data="data"
           :props="defaultProps"
-          :default-expand-all="false"
+          :default-expand-all="true"
           @node-click="handleNodeClick"
         />
       </el-aside>
@@ -43,6 +43,41 @@
 
         <el-row style="margin-top: 20px">
           <!-- 排班日期对应的排班医生 -->
+          <el-table
+            v-loading="listLoading"
+            :data="scheduleList"
+            bordere
+            fit
+            highlight-current-row
+          >
+            <el-table-column label="序号" width="60" align="center">
+              <template slot-scope="scope">
+                {{ scope.$index + 1 }}
+              </template>
+            </el-table-column>
+            <el-table-column label="职称" width="150">
+              <template slot-scope="scope">
+                {{ scope.row.title }} | {{ scope.row.docname }}
+              </template>
+            </el-table-column>
+            <el-table-column label="号源时间" width="80">
+              <template slot-scope="scope">
+                {{ scope.row.workTime == 0 ? "上午" : "下午" }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="reservedNumber"
+              label="可预约数"
+              width="80"
+            />
+            <el-table-column
+              prop="availableNumber"
+              label="剩余预约数"
+              width="100"
+            />
+            <el-table-column prop="amount" label="挂号费(元)" width="90" />
+            <el-table-column prop="skill" label="擅长技能" />
+          </el-table>
         </el-row>
       </el-main>
     </el-container>
@@ -76,7 +111,10 @@ export default {
 
       page: 1, // 当前页
       limit: 10, // 每页个数
-      total: 0 // 总页码
+      total: 0, // 总页码
+
+      scheduleList: [],
+      listLoading: false
     }
   },
   // 计算属性:类似于data概念,有缓存效果,用于不经常修改的数据
@@ -98,6 +136,12 @@ export default {
   destroyed() {},
   // 方法集合
   methods: {
+    getDetailSchedule() {
+      hospApi.getScheduleDetail(this.hospcode, this.depcode, this.workDate)
+        .then((result) => {
+          this.scheduleList = result.data
+        })
+    },
     fetchData(hospcode) {
       hospApi.getDeptByHospcode(hospcode).then((result) => {
         this.data = result.data
@@ -123,16 +167,16 @@ export default {
           this.bookingScheduleList = response.data.bookingScheduleRuleList
           this.total = response.data.total
 
-          this.scheduleList = response.data.scheduleList
           this.baseMap = response.data.baseMap
-
           // 分页后workDate=null，默认选中第一个
-          if (this.workDate == null) {
+          if (this.bookingScheduleList[0] && this.workDate == null) {
             this.workDate = this.bookingScheduleList[0].workDate
           }
+          this.getDetailSchedule()
         })
     },
     handleNodeClick(data) {
+      this.scheduleList = null
       // 科室大类直接返回
       if (data.children != null) return
       this.depcode = data.depcode
@@ -143,6 +187,7 @@ export default {
     selectDate(workDate, index) {
       this.workDate = workDate
       this.activeIndex = index
+      this.getDetailSchedule()
     },
     getCurDate() {
       var datetime = new Date()
