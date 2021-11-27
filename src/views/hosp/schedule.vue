@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
-    <div style="margin-bottom: 10px; font-size: 10px">选择：</div>
+    <div style="margin-bottom: 10px; font-size: 10px">部门：{{ depname }}</div>
     <el-container style="height: 100%">
       <el-aside width="200px" style="border: 1px silver solid">
         <!-- 部门 -->
         <el-tree
-          :data="data"
+          :data="deptList"
           :props="defaultProps"
           :default-expand-all="true"
           @node-click="handleNodeClick"
@@ -95,7 +95,7 @@ export default {
   data() {
     // 这里存放数据
     return {
-      data: [],
+      deptList: [],
       defaultProps: {
         children: 'children',
         label: 'depname'
@@ -144,11 +144,11 @@ export default {
     },
     fetchData(hospcode) {
       hospApi.getDeptByHospcode(hospcode).then((result) => {
-        this.data = result.data
+        this.deptList = result.data
         // 默认选中第一个
-        if (this.data.length > 0) {
-          this.depcode = this.data[0].children[0].depcode
-          this.depname = this.data[0].children[0].depname
+        if (this.deptList.length > 0) {
+          this.depcode = this.deptList[0].children[0].depcode
+          this.depname = this.deptList[0].children[0].depname
 
           this.getPage()
         }

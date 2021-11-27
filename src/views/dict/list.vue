@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="el-toolbar">
       <div class="el-toolbar-body" style="justify-content: flex-start">
-        <a href="http://localhost:8202/admin/cmn/dict/export" target="_blank">
+        <a href="http://localhost/admin/cmn/dict/export" target="_blank">
           <el-button type="text">
             <i class="fa fa-plus">导出</i>
           </el-button>
@@ -55,7 +55,7 @@
           <el-upload
             :multiple="false"
             :on-success="onUploadSuccess"
-            :action="'http://localhost:8202/admin/cmn/dict/import'"
+            :action="'http://localhost/admin/cmn/dict/import'"
             class="upload-demo"
           >
             <el-button size="small" type="primary">点击上传</el-button>
