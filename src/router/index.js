@@ -126,6 +126,36 @@ export const constantRouterMap = [
   },
 
   {
+    path: '/user',
+    component: Layout,
+    redirect: '/user/userInfo/list',
+    name: '用户管理',
+    meta: { title: '用户管理', icon: 'example' },
+    alwaysShow: true,
+    children: [
+      {
+        path: 'userInfo/list',
+        name: '用户列表',
+        component: () => import('@/views/user/userInfo/list'),
+        meta: { title: '用户列表', icon: 'table' }
+      },
+      {
+        path: 'userInfo/show/:id',
+        name: '用户详情',
+        component: () => import('@/views/user/userInfo/show'),
+        meta: { title: '用户详情', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: 'userInfo/authLIst',
+        name: '认证审批',
+        component: () => import('@/views/user/userInfo/authList'),
+        meta: { title: '认证审批', icon: 'table' }
+      }
+    ]
+  },
+
+  {
     path: '/form',
     component: Layout,
     children: [
