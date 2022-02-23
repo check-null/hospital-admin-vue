@@ -41,6 +41,10 @@
           />
         </el-row>
 
+        <el-row>
+          <el-button type="primary" size="mini" @click="dialogTableVisible = true">新增排班</el-button>
+        </el-row>
+
         <el-row style="margin-top: 20px">
           <!-- 排班日期对应的排班医生 -->
           <el-table
@@ -81,6 +85,21 @@
         </el-row>
       </el-main>
     </el-container>
+    <el-dialog :visible.sync="dialogTableVisible" title="收货地址">
+      <el-table :data="gridData">
+        <el-table-column
+          property="date"
+          label="日期"
+          width="150"
+        />
+        <el-table-column
+          property="name"
+          label="姓名"
+          width="200"
+        />
+        <el-table-column property="address" label="地址"/>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -114,7 +133,8 @@ export default {
       total: 0, // 总页码
 
       scheduleList: [],
-      listLoading: false
+      listLoading: false,
+      dialogTableVisible: false
     }
   },
   // 计算属性:类似于data概念,有缓存效果,用于不经常修改的数据
@@ -137,7 +157,8 @@ export default {
   // 方法集合
   methods: {
     getDetailSchedule() {
-      hospApi.getScheduleDetail(this.hospcode, this.depcode, this.workDate)
+      hospApi
+        .getScheduleDetail(this.hospcode, this.depcode, this.workDate)
         .then((result) => {
           this.scheduleList = result.data
         })
