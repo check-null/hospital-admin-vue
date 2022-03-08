@@ -40,7 +40,12 @@
             @current-change="getPage"
           />
         </el-row>
-
+        <el-button
+          type="primary"
+          size="mini"
+          @click="drawer = true"
+        >新增排班</el-button
+        >
         <el-row style="margin-top: 20px">
           <!-- 排班日期对应的排班医生 -->
           <el-table
@@ -81,6 +86,86 @@
         </el-row>
       </el-main>
     </el-container>
+    <el-drawer :visible.sync="drawer" title="新增排班">
+      <div class="schedule-form">
+        <el-form ref="form" :model="schedule" label-width="100px">
+          <el-form-item label="医院编号">
+            <el-input v-model="hospcode" readonly />
+          </el-form-item>
+          <el-form-item label="医院编号">
+            <el-input v-model="depcode" readonly />
+          </el-form-item>
+          <el-form-item label="职称">
+            <el-select v-model="schedule.title" placeholder="请选择职称">
+              <el-option label="医师" value="医师" />
+              <el-option label="副主任医师" value="副主任医师" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="医生名称">
+            <el-select v-model="schedule.docname" placeholder="请选择医生名称">
+              <el-option label="邵迎红" value="邵迎红" />
+              <el-option label="裴育" value="裴育" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="擅长技能">
+            <el-select v-model="schedule.skill" placeholder="请选择医生名称">
+              <el-option label="邵迎红" value="邵迎红" />
+              <el-option label="裴育" value="裴育" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="排班日期">
+            <el-date-picker
+              v-model="schedule.workDate"
+              format="yyyy-MM-dd"
+              type="date"
+              placeholder="选择日期"
+            />
+          </el-form-item>
+          <el-form-item label="上下午">
+            <el-switch
+              v-model="workTime"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              active-text="上午"
+              inactive-text="下午"
+              active-value="0"
+              inactive-value="1"
+            />
+          </el-form-item>
+          <el-form-item label="可预约数">
+            <el-input
+              v-model.number="schedule.reservedNumber"
+              type="number"
+              placeholder="请输入可预约数"
+            />
+          </el-form-item>
+          <el-form-item label="剩余预约数">
+            <el-input
+              v-model.number="schedule.availableNumber"
+              type="number"
+              placeholder="请输入剩余预约数"
+            />
+          </el-form-item>
+          <el-form-item label="挂号费">
+            <el-input
+              v-model.number="schedule.amount"
+              type="number"
+              placeholder="请输入挂号费"
+            />
+          </el-form-item>
+          <el-form-item label="排班状态">
+            <el-radio-group v-model="schedule.status">
+              <el-radio label="0">停诊</el-radio>
+              <el-radio label="1">可约</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="addSchedule">确认</el-button>
+            <el-button>取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -114,7 +199,10 @@ export default {
       total: 0, // 总页码
 
       scheduleList: [],
-      listLoading: false
+      listLoading: false,
+      drawer: false,
+      schedule: {},
+      workTime: '0'
     }
   },
   // 计算属性:类似于data概念,有缓存效果,用于不经常修改的数据
@@ -137,7 +225,8 @@ export default {
   // 方法集合
   methods: {
     getDetailSchedule() {
-      hospApi.getScheduleDetail(this.hospcode, this.depcode, this.workDate)
+      hospApi
+        .getScheduleDetail(this.hospcode, this.depcode, this.workDate)
         .then((result) => {
           this.scheduleList = result.data
         })
@@ -199,6 +288,13 @@ export default {
       var date =
         datetime.getDate() < 10 ? '0' + datetime.getDate() : datetime.getDate()
       return year + '-' + month + '-' + date
+    },
+    addSchedule() {
+      this.schedule = {
+        hoscode: this.hospcode,
+        depcode: this.depcode
+      }
+      console.log(this.schedule)
     }
   } // 生命周期-销毁完成
 }
@@ -213,4 +309,9 @@ export default {
 .el-checkbox__input.is-checked + .el-checkbox__label {
   color: black;
 }
+
+.schedule-form {
+  margin: 0 10px;
+}
+
 </style>
