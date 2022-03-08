@@ -109,8 +109,9 @@
           </el-form-item>
           <el-form-item label="擅长技能">
             <el-select v-model="schedule.skill" placeholder="请选择医生名称">
-              <el-option label="邵迎红" value="邵迎红" />
-              <el-option label="裴育" value="裴育" />
+              <el-option label="内分泌与代谢性疾病" value="内分泌与代谢性疾病" />
+              <el-option label="内分泌科常见病" value="内分泌科常见病" />
+              <el-option label="骨质疏松和骨代谢疾病、糖尿病、甲状腺疾病" value="骨质疏松和骨代谢疾病、糖尿病、甲状腺疾病" />
             </el-select>
           </el-form-item>
           <el-form-item label="排班日期">
