@@ -56,5 +56,12 @@ export default {
       url: `/admin/hosp/schedule/getScheduleDetail/${hoscode}/${depcode}/${workDate}`,
       method: 'get'
     })
+  },
+  addSchedule(schedule) {
+    return request({
+      url: '/admin/hosp/schedule/add',
+      method: 'post',
+      data: schedule
+    })
   }
 }
