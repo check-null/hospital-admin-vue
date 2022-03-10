@@ -298,6 +298,7 @@ export default {
     addSchedule() {
       this.schedule['hoscode'] = this.hospcode
       this.schedule['depcode'] = this.depcode
+      this.schedule['workTime'] = this.workTime
       console.log(this.schedule)
       hospApi.addSchedule(this.schedule).then((data) => {
         if (data.code === 200) {
@@ -305,6 +306,7 @@ export default {
             'type': 'success',
             'message': '添加成功'
           })
+          this.getScheduleRule()
         }
         this.schedule = { workTime: '0', status: '1' }
       })
